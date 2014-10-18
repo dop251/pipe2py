@@ -18,31 +18,38 @@ def pipe_datebuilder(context, _INPUT, conf, **kwargs):
     date
     """
     for item in _INPUT:
-        date = util.get_value(conf['DATE'], item, **kwargs).lower()
-    
-        if date.endswith(' day') or date.endswith(' days'):
-            count = int(date.split(' ')[0])
-            date = (datetime.today() + timedelta(days=count)).timetuple()
-        elif date.endswith(' year') or date.endswith(' years'):
-            count = int(date.split(' ')[0])
-            date = datetime.today().replace(year = datetime.today().year + count).timetuple()
-        elif date == 'today':
-            date = datetime.today().timetuple()
-        elif date == 'tomorrow':
-            date = (datetime.today() + timedelta(days=1)).timetuple()
-        elif date == 'yesterday':
-            date = (datetime.today() + timedelta(days=-1)).timetuple()
-        elif date == 'now':  #todo is this allowed by Yahoo?
-            date = datetime.now().timetuple()  #better to use utcnow?
+        date = util.get_value(conf['DATE'], item, **kwargs)
+        try:
+            date = float(date)
+        except ValueError: pass
+        if type(date) == float or type(date) == int:
+            date = datetime.utcfromtimestamp(date)
         else:
-            for df in util.ALTERNATIVE_DATE_FORMATS:
-                try:
-                    date = datetime.strptime(date, df).timetuple()
-                    break
-                except:
-                    pass
+            date = str(date).lower()
+            if date.endswith(' day') or date.endswith(' days'):
+                count = int(date.split(' ')[0])
+                date = (datetime.utcnow() + timedelta(days=count))
+            elif date.endswith(' year') or date.endswith(' years'):
+                count = int(date.split(' ')[0])
+                date = datetime.utcnow()
+                date = date.replace(year = date.year + count)
+            elif date == 'today':
+                date = datetime.utcnow()
+            elif date == 'tomorrow':
+                date = (datetime.utcnow() + timedelta(days=1))
+            elif date == 'yesterday':
+                date = (datetime.utcnow() + timedelta(days=-1))
+            elif date == 'now':  #todo is this allowed by Yahoo?
+                date = datetime.utcnow()
             else:
-                #todo: raise an exception: unexpected date format
-                pass
+                for df in util.ALTERNATIVE_DATE_FORMATS:
+                    try:
+                        date = datetime.strptime(date, df)
+                        break
+                    except:
+                        pass
+                else:
+                    #todo: raise an exception: unexpected date format
+                    pass
             
         yield date

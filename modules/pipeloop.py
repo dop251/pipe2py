@@ -31,8 +31,9 @@ def pipe_loop(context, _INPUT, conf, embed=None, **kwargs):
     #Prepare the submodule to take parameters from the loop instead of from the user
     embed_context = copy.copy(context)
     embed_context.submodule = True
-    
-    for item in _INPUT:        
+    for item in _INPUT:
+        if item == True:
+            break
         if loop_with:
             inp = util.get_subkey(loop_with, item)
         else:
@@ -62,11 +63,11 @@ def pipe_loop(context, _INPUT, conf, embed=None, **kwargs):
                             results.append(i)
                         else:
                             results = [i]
-            if results and mode == 'assign':
+            #if results and mode == 'assign':
                 #this is a hack to make sure fetchpage works in an out of a loop while not disturbing strconcat in a loop etc.
                 #(goes with the comment below about checking the delivery capability of the source)
-                if len(results) == 1 and isinstance(results[0], dict):
-                    results = [results]
+                #if len(results) == 1 and isinstance(results[0], dict):
+                #    results = [results]
         except HTTPError:  #todo any other errors we want to continue looping after?
             if context.verbose:
                 print "Submodule gave HTTPError - continuing the loop"

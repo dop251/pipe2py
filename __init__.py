@@ -17,7 +17,7 @@ class Context(object):
                 e.g. {'name one': 'test value1'}
        submodule = take input from inputs because this is a submodule
     """
-    def __init__(self, verbose=False, describe_input=False, test=False, console=True, inputs=None, submodule=False):
+    def __init__(self, verbose=False, describe_input=False, test=False, console=True, inputs=None, submodule=False, useragent=None):
         if inputs is None:
             inputs = {}
         self.verbose = verbose
@@ -26,3 +26,4 @@ class Context(object):
         self.describe_input = describe_input
         self.inputs = inputs
         self.submodule = submodule
+        self.useragent = useragent

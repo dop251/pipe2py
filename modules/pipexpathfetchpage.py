@@ -34,15 +34,7 @@ def pipe_xpathfetchpage(context, _INPUT, conf, **kwargs):
                 print "XPathFetchPage: Preparing to download:",url
                 
             try:
-                request = urllib2.Request(url)
-                request.add_header('User-Agent','Yahoo Pipes 1.0')
-                request = urllib2.build_opener().open(request)
-                content = unicode(request.read(),
-                                  request.headers['content-type'].split('charset=')[-1])
-        
-                # TODO it seems that Yahoo! converts relative links to absolute
-                # TODO this needs to be done on the content but seems to be a non-trival
-                # TODO task python?
+                content = util.fetch_url(url)
         
                 xpath = util.get_value(conf["xpath"], _INPUT, **kwargs)
                 html5 = False
@@ -65,7 +57,8 @@ def pipe_xpathfetchpage(context, _INPUT, conf, **kwargs):
                 
                 if context.verbose:
                     print "XPathFetchPage: found count items:",len(res_items)
-        
+                    if len(res_items) == 0:
+                        print "Content: %s" % content
                 for res_item in res_items:
                     i = util.etree_to_pipes(res_item) #TODO xml_to_dict(res_item)                    
                     if context.verbose:

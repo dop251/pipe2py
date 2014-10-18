@@ -35,8 +35,10 @@ def pipe_filter(context, _INPUT, conf, **kwargs):
         field = rule['field']['value']
         value = util.get_value(rule['value'], None, **kwargs) #todo use subkey?
         rules.append((field, rule['op']['value'], value))
-    
+
     for item in _INPUT:
+        if item == True:
+            break
         if combine in COMBINE_BOOLEAN: 
             res = COMBINE_BOOLEAN[combine](_rulepass(rule, item) for rule in rules)
         else:

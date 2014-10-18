@@ -31,4 +31,6 @@ def pipe_union(context, _INPUT, conf, **kwargs):
     for other in kwargs:
         if other.startswith('_OTHER'):
             for item in kwargs[other]:
+                if item == True:
+                    break
                 yield item

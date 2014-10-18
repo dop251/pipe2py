@@ -31,7 +31,7 @@ RSS_FIELDS = {
 }
 
 def transform_to_rss(item, conf):
-    new = dict()
+    new = item
     for i in RSS_FIELDS:
         try:
             field_conf = conf[i]

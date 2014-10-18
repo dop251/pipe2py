@@ -22,12 +22,14 @@ def pipe_strconcat(context, _INPUT, conf, **kwargs):
         s = ""
         for part in conf['part']:
             try:
-                s += util.get_value(part, item, **kwargs)
+                p = util.get_value(part, item, **kwargs)
+                if p is None: p = ""
+                s += p
             except AttributeError:
                 continue  #ignore if the item is referenced but doesn't have our source field (todo: issue a warning if debugging?)
-            except TypeError:
+            except TypeError, e:
                 if context.verbose:
-                    print "pipe_strconcat: TypeError"
+                    print "pipe_strconcat: "+str(e)
     
         yield s
 

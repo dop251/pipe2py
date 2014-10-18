@@ -131,7 +131,11 @@ def set_value(item, key, value):
     """Set a key's value in the item
        Note: keys use dot notation and we map onto nested dictionaries, e.g. 'a.content' -> ['a']['content']
     """
-    reduce(lambda i,k:i.setdefault(k, {}), key.split('.')[:-1], item)[key.split('.')[-1]] = value
+    try:
+        reduce(lambda i,k:i.setdefault(k, {}), key.split('.')[:-1], item)[key.split('.')[-1]] = value
+    except:
+        print "exception in set_value(). item: %s, key: %s, value: %s" % (item, key, value)
+        raise
 
 def del_value(item, key):
     """Remove a value (and its key) from the item
@@ -139,13 +143,15 @@ def del_value(item, key):
     """
     del reduce(lambda i,k:i.get(k), [item] + key.split('.')[:-1])[key.split('.')[-1]]
 
+def subkey_getter(key):
+    return lambda item: get_subkey(key, item)
 
 def multikeysort(items, columns):
     """Sorts a list of items by the columns
 
        (columns precedeed with a '-' will sort descending)
     """
-    comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in columns]  
+    comparers = [ ((subkey_getter(col[1:].strip()), -1) if col.startswith('-') else (subkey_getter(col.strip()), 1)) for col in columns]  
     def comparer(left, right):
         for fn, mult in comparers:
             try:
@@ -199,3 +205,31 @@ def url_quote(url):
 
 def recursive_dict(element):
     return element.tag, dict(map(recursive_dict, element)) or element.text
+
+def fetch_url(url, useragent='Yahoo Pipes 1.0'):
+    if url is None:
+        return u''
+    request = urllib2.Request(url)
+    request.add_header('User-Agent', useragent)
+    request = urllib2.build_opener().open(request)
+    c = request.headers['content-type'].split('charset=')
+    if len(c) > 1:
+        charset = c[-1]
+    else:
+        charset = 'utf-8'
+    content = request.read()
+    try:
+        content = unicode(content, charset)
+    except:
+        pass
+
+    # TODO it seems that Yahoo! converts relative links to absolute
+    # TODO this needs to be done on the content but seems to be a non-trival
+    # TODO task python?
+    return content
+
+
+def as_unicode(o):
+    if o is None:
+        return u''
+    return unicode(o)

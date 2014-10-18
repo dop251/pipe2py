@@ -39,14 +39,13 @@ def pipe_regex(context, _INPUT, conf, **kwargs):
             
     for item in _INPUT:
         def sub_fields(matchobj):
-            return util.get_value({'subkey':matchobj.group(1)}, item)
-            
+            return unicode(util.get_value({'subkey':matchobj.group(1)}, item))
+
         for rule in rules:
-            #todo: do we ever need get_value here instead of item[]?
-            if rule[0] in item and item[rule[0]]:
-                util.set_value(item, rule[0], re.sub(rule[1], rule[2], unicode(item[rule[0]])))
-    
-                util.set_value(item, rule[0], re.sub('\$\{(.+)\}', sub_fields, unicode(item[rule[0]])))
+            v = util.as_unicode(util.get_subkey(rule[0], item))
+            v = re.sub(rule[1], rule[2], v)
+            v = re.sub('\$\{([^\}]+)\}', sub_fields, v)
+            util.set_value(item, rule[0], v)
             
         yield item
 

@@ -25,7 +25,7 @@ def pipe_dateformat(context, _INPUT, conf, **kwargs):
         if isinstance(s, basestring):
             for df in util.ALTERNATIVE_DATE_FORMATS:
                 try:
-                    s = datetime.strptime(s, df).timetuple()
+                    s = datetime.strptime(s, df)
                     break
                 except:
                     pass
@@ -33,7 +33,7 @@ def pipe_dateformat(context, _INPUT, conf, **kwargs):
                 #todo: raise an exception: unexpected date format
                 pass
         try:
-            s = time.strftime(date_format, s)   #todo check all PHP formats are covered by Python
+            s = s.strftime(date_format) #todo check all PHP formats are covered by Python
         except TypeError:
             #silent error handling e.g. if item is not a date
             continue

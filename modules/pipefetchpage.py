@@ -37,16 +37,7 @@ def pipe_fetchpage(context, _INPUT, conf, **kwargs):
                 print "FetchPage: Preparing to download:",url
                 
             try:
-                request = urllib2.Request(url)
-                request.add_header('User-Agent','Yahoo Pipes 1.0')
-                request = urllib2.build_opener().open(request)
-                content = unicode(request.read(),
-                                  request.headers['content-type'].split('charset=')[-1])
-        
-                # TODO it seems that Yahoo! converts relative links to absolute
-                # TODO this needs to be done on the content but seems to be a non-trival
-                # TODO task python?
-        
+                content = util.fetch_url(url, useragent=context.useragent)
                 if context.verbose:
                     print "............FetchPage: content ................."
                     print content.encode("utf-8")

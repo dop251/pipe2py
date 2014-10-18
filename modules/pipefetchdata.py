@@ -39,9 +39,9 @@ def pipe_fetchdata(context, _INPUT, conf,  **kwargs):
             match = None
             
             #Parse the file into a dictionary
+            f = util.fetch_url(url, useragent=context.useragent)
             try:
-                f = urllib2.urlopen(url)
-                ft = ElementTree.parse(f)
+                ft = ElementTree.fromstring(f)
                 if context.verbose:
                     print "pipe_fetchdata loading xml:", url
                 root = ft.getroot()
@@ -65,11 +65,12 @@ def pipe_fetchdata(context, _INPUT, conf,  **kwargs):
                 else:
                     i = util.etree_to_pipes(root)
                     yield i
-                    
+            except urllib2.URLError, e:
+                if context.verbose:
+                    print "pipe_fetchdata failed: ", e
             except Exception, e:
                 try:
-                    f = urllib2.urlopen(url)
-                    d = json.load(f)
+                    d = json.loads(f)
                     #todo test:-
                     if context.verbose:
                         print "pipe_fetchdata loading json:", url
