@@ -70,8 +70,11 @@ def _rulepass(rule, item):
         except UnicodeDecodeError:
             pass
     if op == "matches":
-        if re.search(value, data):
-            return True
+        try:
+            if data is not None and re.search(value, data):
+                return True
+        except TypeError:
+            return False
     if op == "is":
         if data == value:
             return True
